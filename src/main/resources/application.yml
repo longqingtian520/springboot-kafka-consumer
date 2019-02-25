@@ -1,0 +1,17 @@
+server:
+  port: 8088
+  
+spring:
+  application:
+    name: consumer
+  kafka:
+    bootstrap-servers: "kafka-node:9092"
+    client-id: 898
+    consumer:
+      enable-auto-commit: true
+      group-id: "test-consumer-group"
+      max-poll-records: 1000
+      auto-commit-interval: 500
+      auto-offset-reset: latest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer 
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer 
