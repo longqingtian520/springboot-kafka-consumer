@@ -8,6 +8,8 @@ spring:
     bootstrap-servers: "kafka-node:9092"
     client-id: 898
     consumer:
+      properties:
+        max.partition.fetch.bytes: 2097152
       enable-auto-commit: true
       group-id: "test-consumer-group"
       max-poll-records: 1000
@@ -15,3 +17,4 @@ spring:
       auto-offset-reset: latest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer 
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer 
+      

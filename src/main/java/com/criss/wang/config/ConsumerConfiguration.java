@@ -14,7 +14,6 @@ import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology;
 import org.apache.kafka.streams.kstream.JoinWindows;
 import org.apache.kafka.streams.kstream.KStream;
-import org.apache.kafka.streams.kstream.KStreamBuilder;
 import org.apache.kafka.streams.kstream.ValueJoiner;
 import org.apache.kafka.streams.processor.WallclockTimestampExtractor;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,11 +48,10 @@ public class ConsumerConfiguration {
 		props.put(ProducerConfig.RETRIES_CONFIG, 0);// 消息发送重试
 		props.put(StreamsConfig.POLL_MS_CONFIG, 5);// 消息接收间隔
 
-		KStreamBuilder kStreamBuilder = new KStreamBuilder();
 		StreamsBuilder builder = new StreamsBuilder();
 		// 数据输入流
-		KStream<String, String> left = kStreamBuilder.stream("criss-test");
-		KStream<String, String> right = kStreamBuilder.stream("criss-another-test");
+		KStream<String, String> left = builder.stream("criss-test");
+		KStream<String, String> right = builder.stream("criss-another-test");
 		// 作业处理
 		KStream<String, String> all = left.selectKey((key, value) -> value.split(",")[1]).leftJoin(
 				right.selectKey((key, value) -> value.split(",")[0]), new ValueJoiner<String, String, String>() {
@@ -65,11 +63,13 @@ public class ConsumerConfiguration {
 
 		// 输出到控制台
 		all.print();
+
 		// 转发到第三方topic
 		all.to("criss-out-topic");
 
+		Topology topology = builder.build();
 		StreamsConfig config = new StreamsConfig(props);
-		KafkaStreams streams = new KafkaStreams(kStreamBuilder, config);
+		KafkaStreams streams = new KafkaStreams(topology, config);
 		streams.start();
 
 		return all;
